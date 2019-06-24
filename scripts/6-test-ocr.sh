@@ -22,3 +22,5 @@ mkdir ./ocr-files/
 rm ./ocr-files/*
 docker cp t4cmp:/home/ocr-files/ ./
 echo "Check results in ./ocr-files directory"
+
+#docker exec -it t4cmp tesseract /tmp/t4-res/demo3.jpg /tmp/t4-res/demo3.jpg --oem 1 -l chi_sim
