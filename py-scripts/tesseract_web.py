@@ -14,9 +14,11 @@ flask run
 """
 import argparse
 import tempfile
+import subprocess
 import os
 from datetime import datetime
-from flask import Flask, request
+import time
+from flask import Flask, request, render_template
 
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 't4-res')
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -27,7 +29,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/")
 def index():
-    return "It works."
+    return render_template('index.html')
 
 
 @app.route('/upload', methods=['post'])
@@ -42,8 +44,24 @@ def upload():
     # save img into tmp dir
     f.save(tmp_file_dir)
     # use tesseract-ocr
-    os.system(
-        'docker exec -it t4cmp tesseract ' + tmp_file_dir + ' ' + tmp_file_dir + ' --oem 1 -l chi_sim')
+    # the input device is not a TTY
+    # https://stackoverflow.com/questions/43099116/error-the-input-device-is-not-a-tty
+    # https://stackoverflow.com/questions/49724232/docker-compose-exec-python-the-input-device-is-not-a-tty-in-aws-ec2-userdata
+    cmd_str = 'docker exec -i t4cmp tesseract ' + \
+        tmp_file_dir + ' ' + tmp_file_dir + ' --oem 1 -l chi_sim'
+    # method 1
+    # os.system(cmd_str)
+    print(cmd_str)
+    # method 2
+    p = subprocess.Popen(cmd_str, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE, shell=True)
+    p.daemon = True
+    output, errors = p.communicate()
+    print(output)
+    print(errors)
+    # subprocess.call(cmd_str, shell=True)
+
+    time.sleep(1)
     with open(tmp_file_dir + '.txt') as file_obj:
         return file_obj.read()
     return ''

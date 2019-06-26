@@ -34,7 +34,7 @@ You can get into the container using SSH:
 - [password](https://github.com/tesseract-shadow/tesseract-ocr-compilation/blob/fb93548e4ec756bda3dbc0237f58c23053441953/Dockerfile#L41)
 
 ## Flask run
-* run `python tesseract_web.py --host=0.0.0.0 --port=5000` to start service, wget `http://localhost:5000/` return `it works.` means service is stared successfully.
+* run `python tesseract_web.py --host=0.0.0.0 --port=5000` to start service, wget `http://localhost:5000/` return `it works.` means service is stared successfully. for instance `nohup python -u tesseract_web.py --port=5000 &`
 
 * upload image and return ocr result after few secends.
 ```POST /upload HTTP/1.1
